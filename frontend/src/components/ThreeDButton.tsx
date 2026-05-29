@@ -11,7 +11,9 @@ export default function ThreeDButton({ enabled, onClick }: Props) {
       type="button"
       onClick={onClick}
       className={`grid h-12 w-12 place-items-center rounded-full shadow-panel transition ${
-        enabled ? "bg-brand-orange text-white" : "bg-white text-slate-950 hover:text-brand-orange"
+        enabled
+          ? "border border-brand-blue bg-brand-blue text-white"
+          : "border border-sky-400/20 bg-slate-950/90 text-sky-100 hover:text-brand-blue"
       }`}
       title={enabled ? "Vista 2D" : "Vista 3D"}
     >

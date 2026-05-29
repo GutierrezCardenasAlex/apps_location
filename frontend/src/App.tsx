@@ -6,6 +6,7 @@ import ZoomControls from "./components/ZoomControls";
 import ThreeDButton from "./components/ThreeDButton";
 import RouteSummary from "./components/RouteSummary";
 import { getCurrentLocation } from "./services/geolocation.service";
+import { resolvePlace } from "./services/geocode.service";
 import { getRoute } from "./services/route.service";
 import type { Coordinate, RouteResult, SelectionMode, TransportMode } from "./types/maps";
 
@@ -18,6 +19,8 @@ export default function App() {
   const [selectionMode, setSelectionMode] = useState<SelectionMode>("none");
   const [transportMode, setTransportMode] = useState<TransportMode>("car");
   const [route, setRoute] = useState<RouteResult | null>(null);
+  const [originText, setOriginText] = useState("");
+  const [destinationText, setDestinationText] = useState("");
   const [toast, setToast] = useState("Mapa cargado correctamente.");
   const [isRouting, setIsRouting] = useState(false);
   const [is3D, setIs3D] = useState(false);
@@ -73,6 +76,7 @@ export default function App() {
     (coordinate: Coordinate) => {
       if (selectionMode === "origin") {
         setOrigin(coordinate);
+        setOriginText(formatCoordinate(coordinate));
         setRoute(null);
         setSelectionMode("destination");
         setToast("Origen seleccionado. Ahora elige destino.");
@@ -80,6 +84,7 @@ export default function App() {
 
       if (selectionMode === "destination") {
         setDestination(coordinate);
+        setDestinationText(formatCoordinate(coordinate));
         setRoute(null);
         setSelectionMode("none");
         setToast("Destino seleccionado. Puedes calcular la ruta.");
@@ -100,15 +105,48 @@ export default function App() {
   }, [mapActions]);
 
   const useLocationAsOrigin = useCallback(() => {
-    if (!userLocation) {
-      setToast("Activa tu ubicacion para usar tu posicion actual.");
-      return;
+    async function applyLocation() {
+      try {
+        const location = userLocation || (await getCurrentLocation());
+        setUserLocation(location);
+        setOrigin(location);
+        setOriginText(formatCoordinate(location));
+        setRoute(null);
+        setToast("Ubicacion actual usada como origen.");
+        mapActions?.centerOn(location, 15);
+      } catch (error) {
+        setToast(error instanceof Error ? error.message : "Activa tu ubicacion para usar tu posicion actual.");
+      }
     }
 
-    setOrigin(userLocation);
-    setRoute(null);
-    setToast("Ubicacion actual usada como origen.");
-  }, [userLocation]);
+    void applyLocation();
+  }, [mapActions, userLocation]);
+
+  const applyTypedOrigin = useCallback(async () => {
+    try {
+      const coordinate = await resolvePlace(originText);
+      setOrigin(coordinate);
+      setOriginText(formatCoordinate(coordinate));
+      setRoute(null);
+      setToast("Origen actualizado.");
+      mapActions?.centerOn(coordinate, 15);
+    } catch (error) {
+      setToast(error instanceof Error ? error.message : "No se pudo ubicar el origen.");
+    }
+  }, [mapActions, originText]);
+
+  const applyTypedDestination = useCallback(async () => {
+    try {
+      const coordinate = await resolvePlace(destinationText);
+      setDestination(coordinate);
+      setDestinationText(formatCoordinate(coordinate));
+      setRoute(null);
+      setToast("Destino actualizado. Puedes recalcular la ruta.");
+      mapActions?.centerOn(coordinate, 15);
+    } catch (error) {
+      setToast(error instanceof Error ? error.message : "No se pudo ubicar el destino.");
+    }
+  }, [destinationText, mapActions]);
 
   const toggle3D = useCallback(() => {
     const next = !is3D;
@@ -128,7 +166,7 @@ export default function App() {
   );
 
   return (
-    <main className="relative h-dvh w-full overflow-hidden bg-slate-100 text-slate-950">
+    <main className="relative h-dvh w-full overflow-hidden bg-slate-950 text-slate-50">
       <MapView
         initialCenter={initialCenter}
         origin={origin}
@@ -147,12 +185,18 @@ export default function App() {
           <SearchPanel
             origin={origin}
             destination={destination}
+            originText={originText}
+            destinationText={destinationText}
             selectionMode={selectionMode}
             transportMode={transportMode}
             canCalculate={canCalculate}
             isRouting={isRouting}
             onSelectOrigin={() => setSelectionMode("origin")}
             onSelectDestination={() => setSelectionMode("destination")}
+            onOriginTextChange={setOriginText}
+            onDestinationTextChange={setDestinationText}
+            onApplyOriginText={applyTypedOrigin}
+            onApplyDestinationText={applyTypedDestination}
             onUseCurrentLocation={useLocationAsOrigin}
             onTransportChange={handleTransportChange}
             onCalculate={() => calculateRoute()}
@@ -167,4 +211,8 @@ export default function App() {
       </div>
     </main>
   );
+}
+
+function formatCoordinate(coordinate: Coordinate) {
+  return `${coordinate.lat.toFixed(6)},${coordinate.lng.toFixed(6)}`;
 }

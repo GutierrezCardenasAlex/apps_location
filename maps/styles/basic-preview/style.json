@@ -1,23 +1,23 @@
 {
   "version": 8,
-  "name": "Developer Maps Basic Preview",
+  "name": "Developer Maps Dark Preview",
   "sources": {
-    "osm-preview": {
+    "dark-preview": {
       "type": "raster",
       "tiles": [
-        "https://a.tile.openstreetmap.org/{z}/{x}/{y}.png",
-        "https://b.tile.openstreetmap.org/{z}/{x}/{y}.png",
-        "https://c.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        "https://a.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png",
+        "https://b.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png",
+        "https://c.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png"
       ],
       "tileSize": 256,
-      "attribution": "OpenStreetMap"
+      "attribution": "OpenStreetMap, CARTO"
     }
   },
   "layers": [
     {
-      "id": "osm-preview",
+      "id": "dark-preview",
       "type": "raster",
-      "source": "osm-preview",
+      "source": "dark-preview",
       "minzoom": 0,
       "maxzoom": 19
     }

@@ -17,8 +17,8 @@ const labels: Record<TransportMode, string> = {
 
 export default function RouteSummary({ route, mode, toast }: Props) {
   return (
-    <section className="rounded-xl bg-white/95 p-4 shadow-panel backdrop-blur">
-      <p className="mb-3 rounded-lg bg-slate-950 px-3 py-2 text-sm font-bold text-white">{toast}</p>
+    <section className="rounded-xl border border-sky-400/20 bg-slate-950/90 p-4 text-white shadow-panel backdrop-blur">
+      <p className="mb-3 rounded-lg bg-sky-500/15 px-3 py-2 text-sm font-bold text-sky-100">{toast}</p>
 
       {route ? (
         <div className="grid grid-cols-3 gap-2">
@@ -27,13 +27,13 @@ export default function RouteSummary({ route, mode, toast }: Props) {
           <SummaryItem icon={Map} label="Modo" value={labels[route.mode]} />
         </div>
       ) : (
-        <div className="text-sm text-slate-600">
+        <div className="text-sm text-slate-300">
           Selecciona origen y destino para ver distancia, tiempo estimado y ruta recomendada.
         </div>
       )}
 
       {route && mode !== "car" ? (
-        <p className="mt-3 text-xs font-semibold text-slate-500">
+        <p className="mt-3 text-xs font-semibold text-slate-400">
           Tiempo aproximado calculado con distancia de OSRM y velocidad promedio para {labels[mode].toLowerCase()}.
         </p>
       ) : null}
@@ -51,10 +51,10 @@ function SummaryItem({
   value: string;
 }) {
   return (
-    <div className="rounded-lg border border-slate-200 bg-slate-50 p-3">
-      <Icon className="mb-2 text-brand-orange" size={18} />
-      <span className="block text-[11px] font-bold uppercase text-slate-500">{label}</span>
-      <strong className="block text-sm text-slate-950">{value}</strong>
+    <div className="rounded-lg border border-white/10 bg-white/5 p-3">
+      <Icon className="mb-2 text-brand-blue" size={18} />
+      <span className="block text-[11px] font-bold uppercase text-slate-400">{label}</span>
+      <strong className="block text-sm text-white">{value}</strong>
     </div>
   );
 }

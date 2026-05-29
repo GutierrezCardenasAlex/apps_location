@@ -36,11 +36,11 @@ body {
 }
 
 .marker-origin {
-  background: #111111;
+  background: #0f172a;
 }
 
 .marker-destination {
-  background: #ff7a00;
+  background: #0ea5e9;
 }
 
 .marker-user {

@@ -34,8 +34,8 @@ export default function TransportSelector({ value, onChange }: Props) {
             onClick={() => onChange(option.id)}
             className={`flex min-h-[58px] flex-col items-center justify-center gap-1 rounded-lg border text-[11px] font-bold transition ${
               active
-                ? "border-brand-orange bg-brand-orange text-white shadow-lg shadow-orange-500/25"
-                : "border-slate-200 bg-white text-slate-700 hover:border-brand-orange"
+                ? "border-brand-blue bg-brand-blue text-white shadow-lg shadow-sky-500/25"
+                : "border-white/10 bg-white/5 text-slate-300 hover:border-brand-blue hover:text-white"
             }`}
           >
             <Icon size={18} />

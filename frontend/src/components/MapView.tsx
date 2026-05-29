@@ -192,9 +192,13 @@ const fallbackStyle: StyleSpecification = {
   sources: {
     osm: {
       type: "raster",
-      tiles: ["https://a.tile.openstreetmap.org/{z}/{x}/{y}.png", "https://b.tile.openstreetmap.org/{z}/{x}/{y}.png"],
-      tileSize: 256,
-      attribution: "OpenStreetMap"
+        tiles: [
+          "https://a.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png",
+          "https://b.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png",
+          "https://c.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png"
+        ],
+        tileSize: 256,
+        attribution: "OpenStreetMap, CARTO"
     }
   },
   layers: [
@@ -230,7 +234,7 @@ function addRouteLayer(map: Map) {
       "line-join": "round"
     },
     paint: {
-      "line-color": "#ff7a00",
+      "line-color": "#38bdf8",
       "line-width": 6,
       "line-opacity": 0.92
     }
