@@ -1,4 +1,5 @@
 import { useCallback, useMemo, useState } from "react";
+import { ChevronDown, ChevronUp, Search } from "lucide-react";
 import MapView from "./components/MapView";
 import SearchPanel from "./components/SearchPanel";
 import LocationButton from "./components/LocationButton";
@@ -24,6 +25,7 @@ export default function App() {
   const [toast, setToast] = useState("Mapa cargado correctamente.");
   const [isRouting, setIsRouting] = useState(false);
   const [is3D, setIs3D] = useState(false);
+  const [isPanelOpen, setIsPanelOpen] = useState(true);
   const [mapActions, setMapActions] = useState<{
     zoomIn: () => void;
     zoomOut: () => void;
@@ -52,6 +54,7 @@ export default function App() {
       try {
         const result = await getRoute(origin, destination, nextMode);
         setRoute(result);
+        setIsPanelOpen(false);
         setToast("Ruta recomendada lista.");
       } catch (error) {
         setToast(error instanceof Error ? error.message : "No se pudo calcular la ruta.");
@@ -79,6 +82,7 @@ export default function App() {
         setOriginText(formatCoordinate(coordinate));
         setRoute(null);
         setSelectionMode("destination");
+        setIsPanelOpen(false);
         setToast("Origen seleccionado. Ahora elige destino.");
       }
 
@@ -87,6 +91,7 @@ export default function App() {
         setDestinationText(formatCoordinate(coordinate));
         setRoute(null);
         setSelectionMode("none");
+        setIsPanelOpen(true);
         setToast("Destino seleccionado. Puedes calcular la ruta.");
       }
     },
@@ -112,6 +117,7 @@ export default function App() {
         setOrigin(location);
         setOriginText(formatCoordinate(location));
         setRoute(null);
+        setIsPanelOpen(false);
         setToast("Ubicacion actual usada como origen.");
         mapActions?.centerOn(location, 15);
       } catch (error) {
@@ -128,6 +134,7 @@ export default function App() {
       setOrigin(coordinate);
       setOriginText(formatCoordinate(coordinate));
       setRoute(null);
+      setIsPanelOpen(false);
       setToast("Origen actualizado.");
       mapActions?.centerOn(coordinate, 15);
     } catch (error) {
@@ -141,6 +148,7 @@ export default function App() {
       setDestination(coordinate);
       setDestinationText(formatCoordinate(coordinate));
       setRoute(null);
+      setIsPanelOpen(false);
       setToast("Destino actualizado. Puedes recalcular la ruta.");
       mapActions?.centerOn(coordinate, 15);
     } catch (error) {
@@ -180,32 +188,64 @@ export default function App() {
         onMapError={() => setToast("No se pudo cargar el estilo del mapa.")}
       />
 
-      <div className="pointer-events-none absolute inset-0 z-10">
-        <div className="pointer-events-auto absolute left-0 top-0 w-full p-3 md:left-6 md:top-6 md:w-[390px] md:p-0">
-          <SearchPanel
-            origin={origin}
-            destination={destination}
-            originText={originText}
-            destinationText={destinationText}
-            selectionMode={selectionMode}
-            transportMode={transportMode}
-            canCalculate={canCalculate}
-            isRouting={isRouting}
-            onSelectOrigin={() => setSelectionMode("origin")}
-            onSelectDestination={() => setSelectionMode("destination")}
-            onOriginTextChange={setOriginText}
-            onDestinationTextChange={setDestinationText}
-            onApplyOriginText={applyTypedOrigin}
-            onApplyDestinationText={applyTypedDestination}
-            onUseCurrentLocation={useLocationAsOrigin}
-            onTransportChange={handleTransportChange}
-            onCalculate={() => calculateRoute()}
-          />
+      <div className="pointer-events-none absolute inset-0 z-10 pb-[env(safe-area-inset-bottom)]">
+        <div className="pointer-events-auto absolute left-0 right-0 top-0 z-30 p-3 md:left-6 md:right-auto md:top-6 md:w-[400px] md:p-0">
+          <button
+            type="button"
+            onClick={() => setIsPanelOpen((value) => !value)}
+            className="mb-2 flex w-full items-center justify-between rounded-xl border border-sky-400/20 bg-slate-950/90 px-4 py-3 text-left text-white shadow-panel backdrop-blur md:hidden"
+          >
+            <span className="flex min-w-0 items-center gap-2">
+              <Search size={18} className="shrink-0 text-sky-300" />
+              <span className="truncate text-sm font-black">
+                {isPanelOpen ? "Ocultar búsqueda" : route ? `${route.distance_text} · ${route.duration_text}` : "Buscar ruta"}
+              </span>
+            </span>
+            {isPanelOpen ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
+          </button>
+
+          <div
+            className={`transition-all duration-300 md:block ${
+              isPanelOpen
+                ? "max-h-[calc(100dvh-220px)] overflow-y-auto opacity-100"
+                : "max-h-0 overflow-hidden opacity-0 md:max-h-none md:opacity-100"
+            }`}
+          >
+            <SearchPanel
+              origin={origin}
+              destination={destination}
+              originText={originText}
+              destinationText={destinationText}
+              selectionMode={selectionMode}
+              transportMode={transportMode}
+              canCalculate={canCalculate}
+              isRouting={isRouting}
+              onSelectOrigin={() => {
+                setSelectionMode("origin");
+                setIsPanelOpen(false);
+              }}
+              onSelectDestination={() => {
+                setSelectionMode("destination");
+                setIsPanelOpen(false);
+              }}
+              onOriginTextChange={setOriginText}
+              onDestinationTextChange={setDestinationText}
+              onApplyOriginText={applyTypedOrigin}
+              onApplyDestinationText={applyTypedDestination}
+              onUseCurrentLocation={useLocationAsOrigin}
+              onTransportChange={handleTransportChange}
+              onCalculate={() => calculateRoute()}
+            />
+          </div>
         </div>
 
         {floatingControls}
 
-        <div className="pointer-events-auto absolute bottom-3 left-3 right-3 z-20 md:bottom-6 md:left-6 md:right-auto md:w-[390px]">
+        <div
+          className={`pointer-events-auto absolute bottom-3 left-3 right-3 z-20 transition-transform duration-300 md:bottom-6 md:left-6 md:right-auto md:w-[400px] ${
+            isPanelOpen ? "translate-y-1 md:translate-y-0" : "translate-y-0"
+          }`}
+        >
           <RouteSummary route={route} mode={transportMode} toast={toast} />
         </div>
       </div>

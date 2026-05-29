@@ -22,7 +22,7 @@ type Props = {
 
 export default function TransportSelector({ value, onChange }: Props) {
   return (
-    <div className="grid grid-cols-5 gap-2">
+    <div className="grid grid-cols-5 gap-1.5 md:gap-2">
       {options.map((option) => {
         const Icon = option.icon;
         const active = option.id === value;
@@ -32,7 +32,7 @@ export default function TransportSelector({ value, onChange }: Props) {
             key={option.id}
             type="button"
             onClick={() => onChange(option.id)}
-            className={`flex min-h-[58px] flex-col items-center justify-center gap-1 rounded-lg border text-[11px] font-bold transition ${
+            className={`flex min-h-[52px] flex-col items-center justify-center gap-1 rounded-lg border px-1 text-[10px] font-bold transition md:min-h-[58px] md:text-[11px] ${
               active
                 ? "border-brand-blue bg-brand-blue text-white shadow-lg shadow-sky-500/25"
                 : "border-white/10 bg-white/5 text-slate-300 hover:border-brand-blue hover:text-white"

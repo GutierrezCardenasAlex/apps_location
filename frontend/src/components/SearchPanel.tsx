@@ -42,11 +42,11 @@ export default function SearchPanel({
   onCalculate
 }: Props) {
   return (
-    <section className="rounded-xl border border-sky-400/20 bg-slate-950/90 p-4 text-white shadow-panel backdrop-blur md:p-5">
-      <div className="mb-4 flex items-center justify-between gap-4">
+    <section className="rounded-xl border border-sky-400/20 bg-slate-950/90 p-3 text-white shadow-panel backdrop-blur md:p-5">
+      <div className="mb-3 flex items-center justify-between gap-4 md:mb-4">
         <div>
           <p className="text-xs font-black uppercase tracking-[0.18em] text-brand-blue">Developer Maps</p>
-          <h1 className="text-2xl font-black text-white">Plataforma de mapas</h1>
+          <h1 className="text-xl font-black text-white md:text-2xl">Plataforma de mapas</h1>
         </div>
         <div className="rounded-full bg-sky-500/15 px-3 py-1 text-xs font-bold text-sky-200">Beta</div>
       </div>
@@ -76,7 +76,7 @@ export default function SearchPanel({
                 if (event.key === "Enter") onApplyOriginText();
               }}
               placeholder="Ej: -19.5836,-65.7531"
-              className="min-w-0 flex-1 rounded-lg border border-white/10 bg-slate-900 px-3 py-2 text-sm font-semibold text-white outline-none transition placeholder:text-slate-500 focus:border-brand-blue"
+              className="min-w-0 flex-1 rounded-lg border border-white/10 bg-slate-900 px-3 py-2 text-[13px] font-semibold text-white outline-none transition placeholder:text-slate-500 focus:border-brand-blue md:text-sm"
             />
             <button
               type="button"
@@ -121,7 +121,7 @@ export default function SearchPanel({
                 if (event.key === "Enter") onApplyDestinationText();
               }}
               placeholder="Ej: Plaza 10 de Noviembre"
-              className="min-w-0 flex-1 rounded-lg border border-white/10 bg-slate-900 px-3 py-2 text-sm font-semibold text-white outline-none transition placeholder:text-slate-500 focus:border-brand-blue"
+              className="min-w-0 flex-1 rounded-lg border border-white/10 bg-slate-900 px-3 py-2 text-[13px] font-semibold text-white outline-none transition placeholder:text-slate-500 focus:border-brand-blue md:text-sm"
             />
             <button
               type="button"
@@ -152,7 +152,7 @@ export default function SearchPanel({
         Usar mi ubicación como origen
       </button>
 
-      <div className="my-4">
+      <div className="my-3 md:my-4">
         <TransportSelector value={transportMode} onChange={onTransportChange} />
       </div>
 

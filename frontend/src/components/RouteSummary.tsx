@@ -17,8 +17,10 @@ const labels: Record<TransportMode, string> = {
 
 export default function RouteSummary({ route, mode, toast }: Props) {
   return (
-    <section className="rounded-xl border border-sky-400/20 bg-slate-950/90 p-4 text-white shadow-panel backdrop-blur">
-      <p className="mb-3 rounded-lg bg-sky-500/15 px-3 py-2 text-sm font-bold text-sky-100">{toast}</p>
+    <section className="rounded-xl border border-sky-400/20 bg-slate-950/90 p-3 text-white shadow-panel backdrop-blur md:p-4">
+      <p className="mb-2 rounded-lg bg-sky-500/15 px-3 py-2 text-xs font-bold text-sky-100 md:mb-3 md:text-sm">
+        {toast}
+      </p>
 
       {route ? (
         <div className="grid grid-cols-3 gap-2">
@@ -27,13 +29,13 @@ export default function RouteSummary({ route, mode, toast }: Props) {
           <SummaryItem icon={Map} label="Modo" value={labels[route.mode]} />
         </div>
       ) : (
-        <div className="text-sm text-slate-300">
+        <div className="text-xs text-slate-300 md:text-sm">
           Selecciona origen y destino para ver distancia, tiempo estimado y ruta recomendada.
         </div>
       )}
 
       {route && mode !== "car" ? (
-        <p className="mt-3 text-xs font-semibold text-slate-400">
+        <p className="mt-2 text-[11px] font-semibold text-slate-400 md:mt-3 md:text-xs">
           Tiempo aproximado calculado con distancia de OSRM y velocidad promedio para {labels[mode].toLowerCase()}.
         </p>
       ) : null}
@@ -51,10 +53,10 @@ function SummaryItem({
   value: string;
 }) {
   return (
-    <div className="rounded-lg border border-white/10 bg-white/5 p-3">
-      <Icon className="mb-2 text-brand-blue" size={18} />
+    <div className="rounded-lg border border-white/10 bg-white/5 p-2 md:p-3">
+      <Icon className="mb-1 text-brand-blue md:mb-2" size={18} />
       <span className="block text-[11px] font-bold uppercase text-slate-400">{label}</span>
-      <strong className="block text-sm text-white">{value}</strong>
+      <strong className="block text-xs text-white md:text-sm">{value}</strong>
     </div>
   );
 }
