@@ -9,7 +9,7 @@ export default function LocationButton({ onClick }: Props) {
     <button
       type="button"
       onClick={onClick}
-      className="grid h-12 w-12 place-items-center rounded-full bg-white text-slate-950 shadow-panel transition hover:text-flash-orange"
+      className="grid h-12 w-12 place-items-center rounded-full bg-white text-slate-950 shadow-panel transition hover:text-brand-orange"
       title="Mi ubicación"
     >
       <LocateFixed size={22} />

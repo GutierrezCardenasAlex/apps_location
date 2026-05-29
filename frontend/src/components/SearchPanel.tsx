@@ -33,8 +33,8 @@ export default function SearchPanel({
     <section className="rounded-xl bg-white/95 p-4 shadow-panel backdrop-blur md:p-5">
       <div className="mb-4 flex items-center justify-between gap-4">
         <div>
-          <p className="text-xs font-black uppercase tracking-[0.18em] text-flash-orange">FLASH GO</p>
-          <h1 className="text-2xl font-black text-flash-black">Maps Platform</h1>
+          <p className="text-xs font-black uppercase tracking-[0.18em] text-brand-orange">Developer Maps</p>
+          <h1 className="text-2xl font-black text-brand-black">Plataforma de mapas</h1>
         </div>
         <div className="rounded-full bg-slate-950 px-3 py-1 text-xs font-bold text-white">Beta</div>
       </div>
@@ -44,7 +44,7 @@ export default function SearchPanel({
           type="button"
           onClick={onSelectOrigin}
           className={`flex items-center gap-3 rounded-lg border p-3 text-left transition ${
-            selectionMode === "origin" ? "border-flash-orange bg-orange-50" : "border-slate-200 bg-white"
+            selectionMode === "origin" ? "border-brand-orange bg-orange-50" : "border-slate-200 bg-white"
           }`}
         >
           <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-slate-950 text-white">
@@ -62,10 +62,10 @@ export default function SearchPanel({
           type="button"
           onClick={onSelectDestination}
           className={`flex items-center gap-3 rounded-lg border p-3 text-left transition ${
-            selectionMode === "destination" ? "border-flash-orange bg-orange-50" : "border-slate-200 bg-white"
+            selectionMode === "destination" ? "border-brand-orange bg-orange-50" : "border-slate-200 bg-white"
           }`}
         >
-          <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-flash-orange text-white">
+          <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-brand-orange text-white">
             <MapPin size={17} />
           </span>
           <span>
@@ -82,7 +82,7 @@ export default function SearchPanel({
       <button
         type="button"
         onClick={onUseCurrentLocation}
-        className="mt-3 flex w-full items-center justify-center gap-2 rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-black text-slate-800 transition hover:border-flash-orange"
+        className="mt-3 flex w-full items-center justify-center gap-2 rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-black text-slate-800 transition hover:border-brand-orange"
       >
         <LocateFixed size={18} />
         Usar mi ubicación como origen
@@ -96,7 +96,7 @@ export default function SearchPanel({
         type="button"
         disabled={!canCalculate || isRouting}
         onClick={onCalculate}
-        className="w-full rounded-lg bg-flash-orange px-5 py-3 text-sm font-black text-white shadow-lg shadow-orange-500/25 transition hover:bg-orange-600 disabled:cursor-not-allowed disabled:bg-slate-300 disabled:shadow-none"
+        className="w-full rounded-lg bg-brand-orange px-5 py-3 text-sm font-black text-white shadow-lg shadow-orange-500/25 transition hover:bg-orange-600 disabled:cursor-not-allowed disabled:bg-slate-300 disabled:shadow-none"
       >
         {isRouting ? "Calculando..." : "Calcular ruta"}
       </button>

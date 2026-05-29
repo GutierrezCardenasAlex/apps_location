@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import type { MutableRefObject } from "react";
 import maplibregl, { type GeoJSONSource, type Map } from "maplibre-gl";
+import type { StyleSpecification } from "maplibre-gl";
 import { env } from "../config/env";
 import type { Coordinate, RouteResult, SelectionMode } from "../types/maps";
 
@@ -58,49 +59,59 @@ export default function MapView({
   useEffect(() => {
     if (!containerRef.current || mapRef.current) return;
 
-    const map = new maplibregl.Map({
-      container: containerRef.current,
-      style: env.mapStyleUrl,
-      center: [initialCenter.lng, initialCenter.lat],
-      zoom: 13,
-      attributionControl: false
-    });
+    let cancelled = false;
 
-    mapRef.current = map;
+    async function createMap() {
+      const style = await resolveMapStyle(onMapError);
+      if (cancelled || !containerRef.current || mapRef.current) return;
 
-    map.on("load", () => {
-      addRouteLayer(map);
-      onMapReady();
-    });
-
-    map.on("error", onMapError);
-    map.on("click", (event) => {
-      onMapClickRef.current({
-        lng: event.lngLat.lng,
-        lat: event.lngLat.lat
+      const map = new maplibregl.Map({
+        container: containerRef.current,
+        style,
+        center: [initialCenter.lng, initialCenter.lat],
+        zoom: 13,
+        attributionControl: false
       });
-    });
 
-    onActionsReady({
-      zoomIn: () => map.zoomIn(),
-      zoomOut: () => map.zoomOut(),
-      centerOn: (coordinate, zoom = 15) => {
-        map.flyTo({ center: [coordinate.lng, coordinate.lat], zoom, essential: true });
-      },
-      fitRoute: () => {
-        fitRoute(map, routeRef.current);
-      },
-      set3D: (enabled) => {
-        map.easeTo({
-          pitch: enabled ? 60 : 0,
-          bearing: enabled ? -20 : 0,
-          duration: 500
+      mapRef.current = map;
+
+      map.on("load", () => {
+        addRouteLayer(map);
+        onMapReady();
+      });
+
+      map.on("error", onMapError);
+      map.on("click", (event) => {
+        onMapClickRef.current({
+          lng: event.lngLat.lng,
+          lat: event.lngLat.lat
         });
-      }
-    });
+      });
+
+      onActionsReady({
+        zoomIn: () => map.zoomIn(),
+        zoomOut: () => map.zoomOut(),
+        centerOn: (coordinate, zoom = 15) => {
+          map.flyTo({ center: [coordinate.lng, coordinate.lat], zoom, essential: true });
+        },
+        fitRoute: () => {
+          fitRoute(map, routeRef.current);
+        },
+        set3D: (enabled) => {
+          map.easeTo({
+            pitch: enabled ? 60 : 0,
+            bearing: enabled ? -20 : 0,
+            duration: 500
+          });
+        }
+      });
+    }
+
+    void createMap();
 
     return () => {
-      map.remove();
+      cancelled = true;
+      mapRef.current?.remove();
       mapRef.current = null;
     };
   }, [initialCenter.lat, initialCenter.lng, onActionsReady, onMapError, onMapReady]);
@@ -141,6 +152,36 @@ export default function MapView({
 
   return <div ref={containerRef} className="absolute inset-0" />;
 }
+
+async function resolveMapStyle(onMapError: () => void): Promise<string | StyleSpecification> {
+  try {
+    const response = await fetch(env.mapStyleUrl, { cache: "no-store" });
+    if (!response.ok) throw new Error(`Map style returned ${response.status}`);
+    return (await response.json()) as StyleSpecification;
+  } catch (error) {
+    onMapError();
+    return fallbackStyle;
+  }
+}
+
+const fallbackStyle: StyleSpecification = {
+  version: 8,
+  sources: {
+    osm: {
+      type: "raster",
+      tiles: ["https://a.tile.openstreetmap.org/{z}/{x}/{y}.png", "https://b.tile.openstreetmap.org/{z}/{x}/{y}.png"],
+      tileSize: 256,
+      attribution: "OpenStreetMap"
+    }
+  },
+  layers: [
+    {
+      id: "osm",
+      type: "raster",
+      source: "osm"
+    }
+  ]
+};
 
 function addRouteLayer(map: Map) {
   if (map.getSource("route-line")) return;

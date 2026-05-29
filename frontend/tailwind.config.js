@@ -4,7 +4,7 @@ export default {
   theme: {
     extend: {
       colors: {
-        flash: {
+        brand: {
           orange: "#ff7a00",
           black: "#111111"
         }

@@ -52,7 +52,7 @@ function SummaryItem({
 }) {
   return (
     <div className="rounded-lg border border-slate-200 bg-slate-50 p-3">
-      <Icon className="mb-2 text-flash-orange" size={18} />
+      <Icon className="mb-2 text-brand-orange" size={18} />
       <span className="block text-[11px] font-bold uppercase text-slate-500">{label}</span>
       <strong className="block text-sm text-slate-950">{value}</strong>
     </div>

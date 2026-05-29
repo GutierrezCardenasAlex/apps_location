@@ -11,7 +11,7 @@ export default function ZoomControls({ onZoomIn, onZoomOut }: Props) {
       <button
         type="button"
         onClick={onZoomIn}
-        className="grid h-12 w-12 place-items-center text-slate-950 transition hover:text-flash-orange"
+        className="grid h-12 w-12 place-items-center text-slate-950 transition hover:text-brand-orange"
         title="Acercar"
       >
         <Plus size={22} />
@@ -20,7 +20,7 @@ export default function ZoomControls({ onZoomIn, onZoomOut }: Props) {
       <button
         type="button"
         onClick={onZoomOut}
-        className="grid h-12 w-12 place-items-center text-slate-950 transition hover:text-flash-orange"
+        className="grid h-12 w-12 place-items-center text-slate-950 transition hover:text-brand-orange"
         title="Alejar"
       >
         <Minus size={22} />
