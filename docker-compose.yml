@@ -8,8 +8,11 @@ services:
       - tileserver
     ports:
       - "80:80"
+      - "443:443"
     volumes:
       - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./certbot/www:/var/www/certbot:ro
+      - ./certbot/conf:/etc/letsencrypt:ro
     networks:
       - map-server-network
 
@@ -65,6 +68,14 @@ services:
       - ./maps/mbtiles:/data
     expose:
       - "8080"
+    networks:
+      - map-server-network
+
+  certbot:
+    image: certbot/certbot:latest
+    volumes:
+      - ./certbot/www:/var/www/certbot
+      - ./certbot/conf:/etc/letsencrypt
     networks:
       - map-server-network
 

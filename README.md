@@ -154,6 +154,57 @@ curl http://maps.cybernovatech.space/api/health
 curl "http://localhost/osrm/route/v1/driving/-68.1193,-16.4897;-68.1350,-16.5000?overview=false"
 ```
 
+## SSL con Let's Encrypt
+
+El proyecto incluye Certbot para emitir SSL en:
+
+```text
+https://maps.cybernovatech.space
+```
+
+Antes de emitir el certificado, confirma que el DNS del subdominio apunta a la IP publica del servidor:
+
+```bash
+dig +short maps.cybernovatech.space
+```
+
+Abre los puertos HTTP y HTTPS en Ubuntu:
+
+```bash
+sudo ufw allow 80/tcp
+sudo ufw allow 443/tcp
+sudo ufw reload
+```
+
+Si tu proveedor VPS tiene firewall externo, abre tambien los puertos `80` y `443` en el panel.
+
+Configura el correo en `.env`:
+
+```bash
+DOMAIN=maps.cybernovatech.space
+SSL_EMAIL=admin@cybernovatech.space
+```
+
+Emite y activa SSL:
+
+```bash
+chmod +x scripts/*.sh
+./scripts/enable-ssl.sh
+```
+
+Prueba:
+
+```bash
+curl https://maps.cybernovatech.space/api/health
+```
+
+Renovar certificado:
+
+```bash
+docker compose run --rm certbot renew
+docker compose restart nginx
+```
+
 ## TileServer GL
 
 Coloca tus archivos `.mbtiles` en:
@@ -229,6 +280,24 @@ Solucion:
 sudo usermod -aG docker $USER
 newgrp docker
 ```
+
+Error:
+
+```text
+Failed to connect to maps.cybernovatech.space port 80
+```
+
+Solucion:
+
+```bash
+dig +short maps.cybernovatech.space
+docker compose ps
+sudo ufw allow 80/tcp
+sudo ufw allow 443/tcp
+sudo ufw reload
+```
+
+Verifica tambien que el firewall del proveedor VPS permita `80` y `443`.
 
 Error:
 
