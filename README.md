@@ -198,6 +198,14 @@ Prueba:
 curl https://maps.cybernovatech.space/api/health
 ```
 
+Abre la interfaz web:
+
+```text
+https://maps.cybernovatech.space
+```
+
+La pantalla principal muestra un mapa de Bolivia con OpenStreetMap como capa base publica y un boton para probar rutas con OSRM.
+
 Renovar certificado:
 
 ```bash

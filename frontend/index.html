@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Map Server Bolivia</title>
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      integrity="sha256-p4NxAoJBhIINfQbXbMZV3bxx3ZF+54sC6xjI78u7w2A="
+      crossorigin=""
+    />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <main class="app">
+      <aside class="panel">
+        <div>
+          <p class="eyebrow">map-server</p>
+          <h1>Bolivia Maps</h1>
+          <p class="muted">OSRM, PostGIS y tiles preparados para pruebas de rutas.</p>
+        </div>
+
+        <section class="status">
+          <div>
+            <span>API</span>
+            <strong id="api-status">Verificando...</strong>
+          </div>
+          <div>
+            <span>OSRM</span>
+            <strong id="route-status">Listo para probar</strong>
+          </div>
+        </section>
+
+        <section class="controls">
+          <button id="fit-bolivia" type="button">Ver Bolivia</button>
+          <button id="test-route" type="button">Probar ruta La Paz</button>
+          <button id="clear-route" type="button">Limpiar ruta</button>
+        </section>
+      </aside>
+
+      <div id="map" aria-label="Mapa interactivo de Bolivia"></div>
+    </main>
+
+    <script
+      src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+      integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+      crossorigin=""
+    ></script>
+    <script src="/app.js"></script>
+  </body>
+</html>
