@@ -133,11 +133,12 @@ maps.cybernovatech.space -> IP_PUBLICA_DEL_SERVIDOR
 
 Servicios internos:
 
+- `frontend`: app React/Vite servida con Nginx ligero.
 - `backend`: expone `/api/health` dentro de la red Docker.
 - `postgres`: PostGIS sin puerto publicado al host.
 - `osrm`: usa `./osrm/data:/data:ro` y sirve `/data/bolivia-latest.osrm`.
 - `tileserver`: usa `./maps/mbtiles:/data`.
-- `nginx`: publica `80:80` y enruta `/api`, `/osrm` y `/tiles`.
+- `nginx`: publica `80:80` y `443:443`; enruta `/`, `/api`, `/maps`, `/route` y `/osrm`.
 
 Levantar:
 
@@ -152,6 +153,187 @@ Probar:
 curl http://localhost/api/health
 curl http://maps.cybernovatech.space/api/health
 curl "http://localhost/osrm/route/v1/driving/-68.1193,-16.4897;-68.1350,-16.5000?overview=false"
+```
+
+## Plataforma Web De Mapas
+
+El frontend vive en:
+
+```text
+frontend/
+├── package.json
+├── index.html
+├── vite.config.ts
+├── tailwind.config.js
+└── src/
+```
+
+Tecnologias:
+
+- Vite
+- React
+- TypeScript
+- MapLibre GL JS
+- TailwindCSS
+- Axios
+- Lucide React
+
+Variables principales:
+
+```bash
+VITE_MAP_STYLE_URL=/maps/styles/basic-preview/style.json
+VITE_API_URL=/api
+```
+
+Instalar y ejecutar frontend local:
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+Compilar frontend:
+
+```bash
+cd frontend
+npm run build
+```
+
+Levantar toda la plataforma con Docker:
+
+```bash
+docker compose up -d --build
+```
+
+Abrir:
+
+```text
+http://localhost
+https://maps.cybernovatech.space
+```
+
+La interfaz permite:
+
+- Ver el mapa a pantalla completa.
+- Pedir ubicacion actual con `navigator.geolocation`.
+- Elegir origen y destino haciendo clic en el mapa.
+- Usar la ubicacion actual como origen.
+- Calcular ruta con OSRM.
+- Ver distancia y tiempo estimado.
+- Cambiar entre auto, moto, caminar, bici y transporte publico.
+- Hacer zoom con controles personalizados.
+- Activar vista 3D con pitch y bearing de MapLibre.
+
+## API De Rutas
+
+Endpoint:
+
+```bash
+curl "http://localhost/api/route?origin=-19.5836,-65.7531&destination=-19.5890,-65.7550&mode=car"
+```
+
+Modos soportados:
+
+```text
+car
+motorcycle
+walking
+cycling
+public_transport
+```
+
+Respuesta:
+
+```json
+{
+  "mode": "car",
+  "distance_meters": 2500,
+  "duration_seconds": 420,
+  "duration_text": "7 min",
+  "distance_text": "2.5 km",
+  "geometry": {
+    "type": "LineString",
+    "coordinates": [[-65.7531, -19.5836], [-65.755, -19.589]]
+  }
+}
+```
+
+Coordenadas:
+
+- Frontend trabaja con `[lng, lat]`.
+- Backend recibe `lat,lng`.
+- OSRM usa `lng,lat`.
+
+Estimaciones:
+
+- `car`: usa duracion real de OSRM.
+- `motorcycle`: usa OSRM y aplica factor `0.85`.
+- `walking`: distancia / 5 km/h.
+- `cycling`: distancia / 15 km/h.
+- `public_transport`: distancia / 18 km/h + 5 minutos.
+
+El backend intenta guardar cada consulta en `route_logs`. Si PostgreSQL no esta disponible, la ruta sigue respondiendo y solo omite el log.
+
+## Geocoding
+
+Endpoints preparados:
+
+```bash
+curl "http://localhost/api/geocode/search?q=Plaza 10 de Noviembre"
+curl "http://localhost/api/geocode/reverse?lat=-19.5836&lng=-65.7531"
+```
+
+Mientras no exista Nominatim o Photon configurado, responden:
+
+```text
+Geocoding service not configured yet
+```
+
+Para agregar busqueda real despues:
+
+- Levantar Nominatim o Photon como servicio Docker.
+- Crear `GEOCODER_URL` en `.env`.
+- Reemplazar la respuesta placeholder en `backend/src/routes/geocode.routes.js`.
+
+## Apps Moviles Y Otros Proyectos
+
+Puedes consumir esta plataforma desde taxi, delivery, turismo o rastreo usando:
+
+```text
+GET https://maps.cybernovatech.space/api/route
+GET https://maps.cybernovatech.space/api/geocode/search
+GET https://maps.cybernovatech.space/api/geocode/reverse
+```
+
+Ejemplo para apps moviles:
+
+```text
+https://maps.cybernovatech.space/api/route?origin=-19.5836,-65.7531&destination=-19.5890,-65.7550&mode=motorcycle
+```
+
+## Cambiar Dominio
+
+Edita:
+
+```text
+nginx/default.conf
+nginx/http.conf
+nginx/ssl.conf
+.env
+```
+
+Cambia:
+
+```text
+maps.cybernovatech.space
+```
+
+por tu nuevo dominio. Luego:
+
+```bash
+docker compose up -d --build
+docker compose restart nginx
 ```
 
 ## SSL con Let's Encrypt

@@ -1,0 +1,51 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family:
+    Inter,
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+}
+
+.maplibregl-ctrl-bottom-left,
+.maplibregl-ctrl-bottom-right {
+  display: none;
+}
+
+.marker {
+  display: grid;
+  height: 34px;
+  width: 34px;
+  place-items: center;
+  border: 3px solid #ffffff;
+  border-radius: 999px;
+  box-shadow: 0 10px 28px rgba(15, 23, 42, 0.25);
+}
+
+.marker-origin {
+  background: #111111;
+}
+
+.marker-destination {
+  background: #ff7a00;
+}
+
+.marker-user {
+  height: 22px;
+  width: 22px;
+  background: #0284c7;
+  border-width: 4px;
+}
