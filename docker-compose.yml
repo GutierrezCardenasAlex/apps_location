@@ -1,0 +1,76 @@
+services:
+  nginx:
+    image: nginx:1.27-alpine
+    restart: unless-stopped
+    depends_on:
+      - backend
+      - osrm
+      - tileserver
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+    networks:
+      - map-server-network
+
+  backend:
+    build:
+      context: ./backend
+    restart: unless-stopped
+    depends_on:
+      - postgres
+      - osrm
+      - tileserver
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      DATABASE_URL: postgres://${POSTGRES_USER:-maps}:${POSTGRES_PASSWORD:-maps_password}@postgres:5432/${POSTGRES_DB:-maps}
+      OSRM_URL: http://osrm:5000
+      TILESERVER_URL: http://tileserver:8080
+    expose:
+      - "3000"
+    networks:
+      - map-server-network
+
+  postgres:
+    image: postgis/postgis:16-3.4
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-maps}
+      POSTGRES_USER: ${POSTGRES_USER:-maps}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-maps_password}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    expose:
+      - "5432"
+    networks:
+      - map-server-network
+
+  osrm:
+    image: ${OSRM_IMAGE:-osrm/osrm-backend:latest}
+    restart: unless-stopped
+    command: osrm-routed --algorithm ${OSRM_ALGORITHM:-mld} /data/${OSRM_FILE:-bolivia-latest.osrm}
+    volumes:
+      - ./osrm/data:/data:ro
+    expose:
+      - "5000"
+    networks:
+      - map-server-network
+
+  tileserver:
+    image: maptiler/tileserver-gl:latest
+    restart: unless-stopped
+    command: ["--port", "8080", "--verbose"]
+    volumes:
+      - ./maps/mbtiles:/data
+    expose:
+      - "8080"
+    networks:
+      - map-server-network
+
+volumes:
+  postgres-data:
+
+networks:
+  map-server-network:
+    name: map-server-network
