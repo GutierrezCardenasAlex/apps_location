@@ -119,6 +119,18 @@ OSRM_ALGORITHM=ch
 
 Nginx es el punto de entrada publico en el puerto `80`.
 
+Dominio configurado:
+
+```text
+maps.cybernovatech.space
+```
+
+En tu proveedor DNS crea un registro `A`:
+
+```text
+maps.cybernovatech.space -> IP_PUBLICA_DEL_SERVIDOR
+```
+
 Servicios internos:
 
 - `backend`: expone `/api/health` dentro de la red Docker.
@@ -138,6 +150,7 @@ Probar:
 
 ```bash
 curl http://localhost/api/health
+curl http://maps.cybernovatech.space/api/health
 curl "http://localhost/osrm/route/v1/driving/-68.1193,-16.4897;-68.1350,-16.5000?overview=false"
 ```
 
