@@ -403,6 +403,27 @@ Coloca tus archivos `.mbtiles` en:
 maps/mbtiles/
 ```
 
+Si TileServer GL muestra `EACCES: permission denied` o intenta descargar `zurich_switzerland.mbtiles`, corrige permisos:
+
+```bash
+./scripts/fix-tileserver-permissions.sh
+docker compose restart tileserver
+```
+
+La ruta principal de estilo:
+
+```text
+/maps/styles/basic-preview/style.json
+```
+
+se sirve desde Nginx usando:
+
+```text
+maps/styles/basic-preview/style.json
+```
+
+Esto evita que el mapa quede en blanco cuando TileServer GL todavia no tiene un `.mbtiles` propio. Para usar mapa 100% propio, coloca un `.mbtiles` valido de Bolivia o tu region en `maps/mbtiles/` y configura TileServer GL para servirlo.
+
 Luego reinicia:
 
 ```bash
