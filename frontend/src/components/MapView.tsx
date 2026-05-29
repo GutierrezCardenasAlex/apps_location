@@ -42,6 +42,9 @@ export default function MapView({
   const mapRef = useRef<Map | null>(null);
   const routeRef = useRef<RouteResult | null>(route);
   const onMapClickRef = useRef(onMapClick);
+  const onActionsReadyRef = useRef(onActionsReady);
+  const onMapReadyRef = useRef(onMapReady);
+  const onMapErrorRef = useRef(onMapError);
   const markersRef = useRef<Record<string, maplibregl.Marker | null>>({
     origin: null,
     destination: null,
@@ -57,12 +60,24 @@ export default function MapView({
   }, [onMapClick]);
 
   useEffect(() => {
+    onActionsReadyRef.current = onActionsReady;
+  }, [onActionsReady]);
+
+  useEffect(() => {
+    onMapReadyRef.current = onMapReady;
+  }, [onMapReady]);
+
+  useEffect(() => {
+    onMapErrorRef.current = onMapError;
+  }, [onMapError]);
+
+  useEffect(() => {
     if (!containerRef.current || mapRef.current) return;
 
     let cancelled = false;
 
     async function createMap() {
-      const style = await resolveMapStyle(onMapError);
+      const style = await resolveMapStyle(() => onMapErrorRef.current());
       if (cancelled || !containerRef.current || mapRef.current) return;
 
       const map = new maplibregl.Map({
@@ -77,10 +92,11 @@ export default function MapView({
 
       map.on("load", () => {
         addRouteLayer(map);
-        onMapReady();
+        setRouteData(map, routeRef.current);
+        onMapReadyRef.current();
       });
 
-      map.on("error", onMapError);
+      map.on("error", () => onMapErrorRef.current());
       map.on("click", (event) => {
         onMapClickRef.current({
           lng: event.lngLat.lng,
@@ -88,7 +104,7 @@ export default function MapView({
         });
       });
 
-      onActionsReady({
+      onActionsReadyRef.current({
         zoomIn: () => map.zoomIn(),
         zoomOut: () => map.zoomOut(),
         centerOn: (coordinate, zoom = 15) => {
@@ -114,7 +130,7 @@ export default function MapView({
       mapRef.current?.remove();
       mapRef.current = null;
     };
-  }, [initialCenter.lat, initialCenter.lng, onActionsReady, onMapError, onMapReady]);
+  }, [initialCenter.lat, initialCenter.lng]);
 
   useEffect(() => {
     const map = mapRef.current;
@@ -136,14 +152,7 @@ export default function MapView({
     const source = map.getSource("route-line") as GeoJSONSource | undefined;
     if (!source) return;
 
-    source.setData({
-      type: "Feature",
-      properties: {},
-      geometry: route?.geometry || {
-        type: "LineString",
-        coordinates: []
-      }
-    });
+    setRouteData(map, route);
 
     if (route) {
       fitRoute(map, route);
@@ -151,6 +160,20 @@ export default function MapView({
   }, [route]);
 
   return <div ref={containerRef} className="absolute inset-0" />;
+}
+
+function setRouteData(map: Map, route: RouteResult | null) {
+  const source = map.getSource("route-line") as GeoJSONSource | undefined;
+  if (!source) return;
+
+  source.setData({
+    type: "Feature",
+    properties: {},
+    geometry: route?.geometry || {
+      type: "LineString",
+      coordinates: []
+    }
+  });
 }
 
 async function resolveMapStyle(onMapError: () => void): Promise<string | StyleSpecification> {
